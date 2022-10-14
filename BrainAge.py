@@ -11,6 +11,7 @@ general_data = pd.DataFrame(general_data)
 brain_data = pd.read_feather("/mnt/UKBiobank/fs_derivatives_reduced.ftr", columns=None, use_threads=True, storage_options=None)
 brain_data = pd.DataFrame(brain_data)
 
+
 # get year and month the brain MRI scan was taken -> format year + month/12
 for i in range(43167):
     if type(general_data.iloc[i,9912]) == str:
@@ -47,15 +48,11 @@ PA_no = general_data[general_data["invitation_to_physical_activity_study_accepta
 PA_yes_brain = brain_data[general_data["invitation_to_physical_activity_study_acceptance_f110005_0_0"] == comp]
 PA_no_brain = brain_data[general_data["invitation_to_physical_activity_study_acceptance_f110005_0_0"] != comp]
 
-# np.savetxt("test_main.csv", PA_yes, delimiter=",", fmt='%s')
-# np.savetxt("train_main.csv", PA_no, delimiter=",", fmt='%s')
-# np.savetxt("test_brain.csv", PA_yes_brain, delimiter=",", fmt='%s')
-# np.savetxt("train_brain.csv", PA_no_brain, delimiter=",", fmt='%s')
 
-PA_yes.to_pickle("test_main.pkl")
-PA_no.to_pickle("train_main.pkl")
-PA_yes_brain.to_pickle("test_brain.pkl")
-PA_no_brain.to_pickle("train_brain.pkl")
+# PA_yes.to_pickle("test_main.pkl")
+# PA_no.to_pickle("train_main.pkl")
+# PA_yes_brain.to_pickle("test_brain.pkl")
+# PA_no_brain.to_pickle("train_brain.pkl")
 
 
 # old way of getting only the 2nd visit (all the data)

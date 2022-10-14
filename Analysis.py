@@ -23,20 +23,22 @@ brain_train = pd.DataFrame(brain_train)
 main_test = pd.DataFrame(main_test)
 main_train = pd.DataFrame(main_train)
 
+
 # delete rows that have a missing value for Age
-brain_train = brain_train.drop(brain_train[np.isnan(brain_train.iloc[:,-1])].index)
-brain_test = brain_test.drop(brain_test[np.isnan(brain_test.iloc[:,-1])].index)
-main_test = main_test.drop(brain_test[np.isnan(brain_test.iloc[:,-1])].index)
-main_train = main_train.drop(brain_train[np.isnan(brain_train.iloc[:,-1])].index)
-
-
+index_age_train = brain_train[np.isnan(brain_train.iloc[:,-1])].index
+index_age_test = brain_test[np.isnan(brain_test.iloc[:,-1])].index
+brain_train = brain_train.drop(index_age_train)
+brain_test = brain_test.drop(index_age_test)
+main_test = main_test.drop(index_age_test)
+main_train = main_train.drop(index_age_train)
 
 # exclude people with long standing illness diability or infirmity
-main_train = main_train.drop(main_train[main_train.iloc[:,967]!= "No"].index)
-main_test = main_test.drop(main_test[main_test.iloc[:,967]!= "No"].index)
-brain_train = brain_train.drop(main_train[main_train.iloc[:,967]!= "No"].index)
-brain_test = brain_test.drop(main_test[main_test.iloc[:,967]!= "No"].index)
-
+index_illness_train = main_train[main_train.iloc[:,967]!= "No"].index
+index_illness_test = main_test[main_test.iloc[:,967]!= "No"].index
+brain_train = brain_train.drop(index_illness_train)
+brain_test = brain_test.drop(index_illness_test)
+main_test = main_test.drop(index_illness_test)
+main_train = main_train.drop(index_illness_train)
 
 # Freesurfer ASEG
 whole_brain = brain_train.iloc[:,27:70:2]
@@ -100,7 +102,7 @@ brain_age_delta = y_pred-Y_test
 
 # check whether brain age gap and age are correlated
 correlation = stats.pearsonr(brain_age_delta, Y_test)
-print(correlation)
+#print(correlation)
 
 # get mean absolute error (MAE)
 print(mean_absolute_error(Y_test,y_pred))
