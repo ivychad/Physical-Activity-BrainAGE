@@ -48,6 +48,9 @@ PA_no = general_data[general_data["invitation_to_physical_activity_study_accepta
 PA_yes_brain = brain_data[general_data["invitation_to_physical_activity_study_acceptance_f110005_0_0"] == comp]
 PA_no_brain = brain_data[general_data["invitation_to_physical_activity_study_acceptance_f110005_0_0"] != comp]
 
+PA_yes.reset_index
+
+print(PA_yes)
 
 # PA_yes.to_pickle("test_main.pkl")
 # PA_no.to_pickle("train_main.pkl")
