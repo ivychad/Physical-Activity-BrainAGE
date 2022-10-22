@@ -142,9 +142,6 @@ brain_training = brain_train_s.dropna(axis=0)
 brain_test_s = pd.DataFrame(brain_test_s)
 brain_testing = brain_test_s.dropna(axis=0)
 
-# df_test_s = pd.DataFrame(df_train_s)
-# new_test = df_test_s.dropna(axis=0)
-
 # # impute nan values in mri data
 # # imp_mean = IterativeImputer(random_state=0)
 # # imp_mean.fit_transform(df[:,:-1])
@@ -155,19 +152,27 @@ Y_train = brain_training.iloc[:,-1]
 X_test = brain_testing.iloc[:,:-1]
 Y_test = brain_testing.iloc[:,-1]
 
+# set of alphas to try
+alpha_parameters = np.power(10,np.linspace(start=-3, stop=5, num=100))
+
+# standardize x data
 scaler = StandardScaler()
 
 X_train_std = scaler.fit_transform(X_train)
 X_test_std = scaler.fit_transform(X_test)
 
-# X = brain_training.iloc[:,:-1]
-# Y = brain_training.iloc[:,-1]
+# cross validation on training set only
+X_CV = X_train_std
+Y_CV = Y_train
+# randomly split data into training and testing set
+X_train_cv, X_test_cv, Y_train_cv, Y_test_cv = train_test_split(X_CV,Y_CV, random_state=8)
+model = RidgeCV(alphas = alpha_parameters)
+model.fit(X_train_cv,Y_train_cv)
+y_pred_cv = model.predict(X_test_cv)
+print("The MAE for cross-validation:", mean_absolute_error(Y_test_cv,y_pred_cv))
 
-# # # randomly split data into training and testing set
-# X_train, X_test, Y_train, Y_test = train_test_split(X,Y, random_state=0)
 
-alpha_parameters = np.power(10,np.linspace(start=-3, stop=5, num=100))
-
+# model on trained on training tested on test
 # model initialization - options to use Lasso, Ridge or SVM
 #model = LassoCV(alphas = alpha_parameters, max_iter=100000)
 #model = RidgeCV(alphas = alpha_parameters)
@@ -187,7 +192,7 @@ correlation = stats.pearsonr(brain_age_delta, Y_test)
 #print(correlation)
 
 # get mean absolute error (MAE)
-print(mean_absolute_error(Y_test,y_pred))
+print("The MAE for testing set:", mean_absolute_error(Y_test,y_pred))
 
 #plot figure with x: actual age Y: predicted age, and a line with slope 1 for reference
 plt.figure()
