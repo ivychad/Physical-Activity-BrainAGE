@@ -13,11 +13,11 @@ from scipy import stats
 
 seed(888)
 
-# load data from csv and convert to array
-brain_test = pd.read_pickle("test_brain.pkl")
-brain_train = pd.read_pickle("train_brain.pkl")
-main_test = pd.read_pickle("test_main.pkl")
-main_train = pd.read_pickle("train_main.pkl")
+# load data from pickle and convert to dataframe
+brain_test = pd.read_pickle("1_brain_test.pkl")
+brain_train = pd.read_pickle("1_brain_train.pkl")
+main_test = pd.read_pickle("1_main_test.pkl")
+main_train = pd.read_pickle("1_main_train.pkl")
 brain_test = pd.DataFrame(brain_test)
 brain_train = pd.DataFrame(brain_train)
 main_test = pd.DataFrame(main_test)
@@ -298,3 +298,8 @@ plt.scatter(main_test["BrainAge Delta"], main_test["Total PA"], alpha=0.5)
 plt.ylabel("Total PA", fontsize = 15)
 plt.xlabel("Brain Age Delta", fontsize = 15)
 plt.show()
+
+
+# pickle end results 
+# train and test excluded data -> cross reference ids
+# train and test data that i want to use for later analysis -> + all brain variables -> testing different segmentations in the 3 Brain Age script

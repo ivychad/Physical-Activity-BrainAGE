@@ -48,18 +48,10 @@ PA_no = general_data[general_data["invitation_to_physical_activity_study_accepta
 PA_yes_brain = brain_data[general_data["invitation_to_physical_activity_study_acceptance_f110005_0_0"] == comp]
 PA_no_brain = brain_data[general_data["invitation_to_physical_activity_study_acceptance_f110005_0_0"] != comp]
 
-PA_yes.reset_index
+# PA_yes.to_pickle("1_main_test.pkl")
+# PA_no.to_pickle("1_main_train.pkl")
+# PA_yes_brain.to_pickle("1_brain_test.pkl")
+# PA_no_brain.to_pickle("1_brain_train.pkl")
 
-print(PA_yes)
-
-# PA_yes.to_pickle("test_main.pkl")
-# PA_no.to_pickle("train_main.pkl")
-# PA_yes_brain.to_pickle("test_brain.pkl")
-# PA_no_brain.to_pickle("train_brain.pkl")
-
-
-# old way of getting only the 2nd visit (all the data)
-# train_brain = np.delete(train_brain, np.s_[2:2545:2], axis=1)
-# test_brain = np.delete(test_brain, np.s_[2:2545:2], axis=1)
 
 

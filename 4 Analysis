@@ -1,0 +1,93 @@
+#%%
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LassoCV, RidgeCV
+from sklearn.svm import SVR
+from sklearn.experimental import enable_iterative_imputer 
+from sklearn.impute import IterativeImputer
+from sklearn.metrics import mean_absolute_error
+from sklearn.preprocessing import *
+from random import seed
+from scipy import stats
+
+# load data from pickle and convert to dataframe
+brain_test = pd.read_pickle("3_brain_test.pkl")
+brain_train = pd.read_pickle("3_brain_train.pkl")
+main_test = pd.read_pickle("3_main_test.pkl")
+main_train = pd.read_pickle("3_main_train.pkl")
+brain_test = pd.DataFrame(brain_test)
+brain_train = pd.DataFrame(brain_train)
+main_test = pd.DataFrame(main_test)
+main_train = pd.DataFrame(main_train)
+
+# %%
+
+# exploratory plots
+
+# compare train and test sets
+# compare included and excluded data (on available domains)
+
+
+# # plot self-reported moderate intensity physical activity
+# plt.figure()
+# plt.hist(main_train.iloc[:,526])
+# plt.hist(main_test.iloc[:,526])
+# plt.title("Days per week of self-rated moderate physical activity")
+# plt.show()
+
+# # MET of moderate intensity physical activity
+# plt.figure()
+# plt.hist(main_train.iloc[:,9990])
+# plt.hist(main_test.iloc[:,9990])
+# plt.title("MET Minutes per week of self-rated moderate physical activity")
+# plt.show()
+
+# # plot self-reported vigorous intensity physical activity
+# plt.figure()
+# plt.hist(main_train.iloc[:,534])
+# plt.hist(main_test.iloc[:,534])
+# plt.title("Days per week of self-rated vigorous physical activity")
+# plt.show()
+
+# # MET of vigorous intensity physical activity
+# plt.figure()
+# vPA_train = main_train.drop(main_train[main_train.iloc[:,9991] > 5000].index)
+# vPA_test = main_test.drop(main_test[main_test.iloc[:,9991] > 5000].index)
+# plt.hist(vPA_train.iloc[:,9991])
+# plt.hist(vPA_test.iloc[:,9991])
+# plt.xticks(range(0,6000,1000))
+# plt.title("MET Minutes per week of self-rated vigorous physical activity")
+# plt.show()
+
+# # plot age
+# plt.figure
+# plt.hist(main_train["Age"])
+# plt.hist(main_test["Age"])
+# plt.title("Age")
+# plt.show()
+
+# # plot gender
+# train_female = (main_train.iloc[:,22] == "Female").sum()/14852
+# train_male = (main_train.iloc[:,22] == "Male").sum()/14582
+# test_female = (main_test.iloc[:,22] == "Female").sum()/12018
+# test_male = (main_test.iloc[:,22] == "Male").sum()/12018
+# plt.figure()
+# plt.pie([train_female,train_male],labels=["Female","Male"], textprops={'fontsize': 15}, colors= ["b","navy"])
+# plt.show()
+# plt.figure()
+# plt.pie([test_female,test_male],labels=["Female","Male"], textprops={'fontsize': 15}, colors = ["orange","orangered"])
+# plt.show()
+
+
+#%%
+
+# correlation analysis
+
+
+# %%
+
+
+
