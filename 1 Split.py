@@ -1,3 +1,9 @@
+"""
+- Calculate Age at time of MRI scan and add to Dataframe
+- Split Data into Training and Test set based on PA accelerometry completion
+
+"""
+
 
 import pandas as pd
 import numpy as np

@@ -1,3 +1,20 @@
+"""
+- Exploratory analysis
+    - General distributions of variables
+    - Comparison of training and testing data
+    - Comparison of excluded and included data
+- Correlation matrix for all variables in the final analysis
+- Network showing partial correlations of all variables in final analysis
+- Specific tests
+
+ToDo
+- comparison excluded included
+- correlation matrix
+- partical correlation network
+
+"""
+
+
 #%%
 
 import numpy as np

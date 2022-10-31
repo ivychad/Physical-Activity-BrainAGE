@@ -1,3 +1,17 @@
+"""
+General: Brain Age prediction based on different segmentations and models
+- Cross validation on training data
+- Models: Lasso, Ridge, SVR
+- Segmentations: Freesurfer ASEG, xyz
+- MAE, plots
+- Add Brain Age for different segmentations to dataset
+
+ToDo
+- different segmentations
+- imputing
+
+"""
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -122,7 +136,6 @@ print("The MAE for testing set:", mean_absolute_error(Y_test,y_pred))
 
 
 # add to pickle brain age based on different segmentations :)
-
 
 
 
