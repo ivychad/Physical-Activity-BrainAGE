@@ -11,6 +11,7 @@ from sklearn.preprocessing import *
 from random import seed
 from scipy import stats
 
+
 seed(888)
 
 # load data from pickle and convert to dataframe
@@ -76,6 +77,57 @@ brain_train = brain_train.drop(health_train)
 brain_test = brain_test.drop(health_test)
 main_test = main_test.drop(health_test)
 main_train = main_train.drop(health_train)
+
+# add PA preprocessing
+# physical activity accelerometer processing
+
+# get weartime duration in minutes (it's in days at default)
+main_test["Wear time in minutes"] = main_test.iloc[:,16686]*1440
+plt.figure
+plt.hist(main_test["Wear time in minutes"])
+plt.title("Wear time in minutes")
+plt.show()
+
+# exclude people with insufficient weartime weartime < 8000 minutes
+wear_time_test = main_test[main_test["Wear time in minutes"]<8000].index
+brain_test = brain_test.drop(wear_time_test)
+main_test = main_test.drop(wear_time_test)
+
+# distributions are cumulative -> substract ditributions from each other
+# determine fraction of weartime spent doing light PA (between 30 and 125 milligravites)
+light_PA = np.asarray(main_test.iloc[:,16763]-main_test.iloc[:,16748])
+# get it in minutes / week
+light_PA = light_PA * main_test["Wear time in minutes"]
+main_test["Light PA"] = light_PA
+
+# determine fraction of weartime spent doing moderate PA (between 125 and 400 milligravites)
+moderate_PA = np.asarray(main_test.iloc[:,16774]-main_test.iloc[:,16763])
+moderate_PA = moderate_PA * main_test["Wear time in minutes"]
+main_test["Moderate PA"] = moderate_PA
+
+# determine fraction of weartime spent doing vigorous PA (above 400 milligravites)
+vigorous_PA = np.asarray(1-main_test.iloc[:,16774])
+vigorous_PA = vigorous_PA * main_test["Wear time in minutes"]
+main_test["Vigorous PA"] = vigorous_PA
+
+# fraction of weartime for above 30 mg -> total summed light, moderate, and vigorous PA
+total_PA = np.asarray(1-main_test.iloc[:,16748])
+total_PA = total_PA * main_test["Wear time in minutes"]
+main_test["Total PA"] = total_PA
+
+# select data for later analysis
+
+
+# pickle end results 
+# train and test excluded data -> cross reference ids
+# train and test data that i want to use for later analysis -> + all brain variables -> testing different segmentations in the 3 Brain Age script
+
+main_test.to_pickle("2_main_test.pkl")
+main_train.to_pickle("2_main_train.pkl")
+brain_test.to_pickle("2_brain_test.pkl")
+brain_train.to_pickle("2_brain_train.pkl")
+
+
 
 # # plot self-reported moderate intensity physical activity
 # plt.figure()
@@ -271,7 +323,8 @@ print(correlation)
 correlation = stats.pearsonr(main_test["BrainAge Delta"], main_test["Moderate PA"])
 print(correlation)
 correlation = stats.pearsonr(main_test["BrainAge Delta"], main_test["Vigorous PA"])
-print(correlation)
+cov_correlation = pg.partial_corr(data=main_test, x='BrainAge Delta', y='Total PA', covar='Age')
+print(cov_correlation)
 correlation = stats.pearsonr(main_test["BrainAge Delta"], main_test["Total PA"])
 print(correlation)
 
@@ -303,3 +356,8 @@ plt.show()
 # pickle end results 
 # train and test excluded data -> cross reference ids
 # train and test data that i want to use for later analysis -> + all brain variables -> testing different segmentations in the 3 Brain Age script
+
+# main_test.to_pickle("2_main_test.pkl")
+# main_train.to_pickle("2_main_train.pkl")
+# brain_test.to_pickle("2_brain_test.pkl")
+# brain_train.to_pickle("2_brain_train.pkl")

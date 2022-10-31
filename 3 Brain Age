@@ -11,6 +11,8 @@ from sklearn.preprocessing import *
 from random import seed
 from scipy import stats
 
+seed(888)
+
 # load data from pickle and convert to dataframe
 brain_test = pd.read_pickle("2_brain_test.pkl")
 brain_train = pd.read_pickle("2_brain_train.pkl")
@@ -120,3 +122,12 @@ print("The MAE for testing set:", mean_absolute_error(Y_test,y_pred))
 
 
 # add to pickle brain age based on different segmentations :)
+
+
+
+
+
+main_test.to_pickle("3_main_test.pkl")
+main_train.to_pickle("3_main_train.pkl")
+brain_test.to_pickle("3_brain_test.pkl")
+brain_train.to_pickle("3_brain_train.pkl")
