@@ -24,6 +24,7 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.preprocessing import *
 from random import seed
 from scipy import stats
+from sklearn.linear_model import LinearRegression
 
 seed(888)
 
@@ -83,14 +84,27 @@ X_train_std = scaler.fit_transform(X_train)
 X_test_std = scaler.fit_transform(X_test)
 
 # cross validation on training set only
-# X_CV = X_train_std
-# Y_CV = Y_train
-# # randomly split data into training and testing set
-# X_train_cv, X_test_cv, Y_train_cv, Y_test_cv = train_test_split(X_CV,Y_CV, random_state=8)
-# model = RidgeCV(alphas = alpha_parameters)
-# model.fit(X_train_cv,Y_train_cv)
-# y_pred_cv = model.predict(X_test_cv)
-# print("The MAE for cross-validation:", mean_absolute_error(Y_test_cv,y_pred_cv))
+X_CV = X_train_std
+Y_CV = Y_train
+# randomly split data into training and testing set
+X_train_cv, X_test_cv, Y_train_cv, Y_test_cv = train_test_split(X_CV,Y_CV, random_state=8)
+model = RidgeCV(alphas = alpha_parameters)
+model.fit(X_train_cv,Y_train_cv)
+y_pred_cv = model.predict(X_test_cv)
+delta_cv = y_pred_cv - Y_test_cv
+print("The MAE for cross-validation:", mean_absolute_error(Y_test_cv,y_pred_cv))
+
+delta_cv = np.asarray(delta_cv)
+delta_cv = np.reshape(delta_cv, (-1,1))
+Y_test_cv = np.asarray(Y_test_cv)
+Y_test_cv = np.reshape(Y_test_cv, (-1,1))
+
+# brain age correction
+reg = LinearRegression().fit(delta_cv, Y_test_cv)
+coef = reg.coef_
+intercept = reg.intercept_
+
+
 
 
 # model on trained on training tested on test
@@ -104,6 +118,7 @@ model.fit(X_train_std,Y_train)
 
 # get predicted values for test set
 y_pred = model.predict(X_test_std)
+main_test["BrainAge"] = y_pred
 
 # calculate brain age gap
 brain_age_delta = y_pred-Y_test
@@ -112,6 +127,17 @@ main_test["BrainAge Delta"] = brain_age_delta
 # check whether brain age gap and age are correlated
 correlation = stats.pearsonr(brain_age_delta, Y_test)
 #print(correlation)
+
+
+# corrected brain age
+function = lambda t: coef * t + intercept
+vfunc = np.vectorize(function)
+offset = vfunc(Y_test)
+corr_brainage = y_pred-offset
+corr_brainage_delta = corr_brainage-Y_test
+
+main_test["BrainAge Corr"] = corr_brainage
+main_test["BrainAge Delta Corr"] = corr_brainage_delta
 
 # get mean absolute error (MAE)
 print("The MAE for testing set:", mean_absolute_error(Y_test,y_pred))

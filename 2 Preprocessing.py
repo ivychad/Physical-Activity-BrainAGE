@@ -16,6 +16,17 @@ ToDo
 - crop main data
 - excluded data
 
+Variables to include from main
+- ID
+- Age at MRI
+- Gender
+- Self reported MET for light, moderate, vigorous
+- For test: Accelerometery light, moderate, vigorous, total
+- Grip stength left and right
+- ECG (maximum workload, maximum heartrate)
+- Job involves heavy manual or physical work
+- BMI
+
 """
 
 import numpy as np
@@ -128,7 +139,26 @@ total_PA = total_PA * main_test["Wear time in minutes"]
 main_test["Total PA"] = total_PA
 
 # select data for later analysis
+main_test_crop = []
+main_test_crop = pd.DataFrame(main_test_crop)
+main_train_crop = []
+main_train_crop = pd.DataFrame(main_train_crop)
 
+main_test_crop["Age"] = main_test["Age"]
+main_test_crop["Total PA"] = main_test["Total PA"]
+main_test_crop["Vigorous PA"] = main_test["Vigorous PA"]
+main_test_crop["Moderate PA"] = main_test["Moderate PA"]
+main_test_crop["Light PA"] = main_test["Light PA"]
+main_test_crop["BMI"] = main_test.iloc[:,11580]
+main_test_crop["ECG max workload"] = main_test.iloc[:, 5773]
+main_test_crop["ECG max heart rate"] = main_test.iloc[:, 5775]
+main_test_crop["SR Walking PA"] = main_test.iloc[:,9989]
+main_test_crop["SR Moderate PA"] = main_test.iloc[:,9990]
+main_test_crop["SR Vigorous PA"] = main_test.iloc[:,9991]
+main_test_crop["Job PA"] = main_test.iloc[:,507]
+main_test_crop["Hand grip L"] = main_test.iloc[:,64]
+main_test_crop["Hand grip R"] = main_test.iloc[:,68]
+#print(main_test_crop)
 
 # select excluded data
 
@@ -137,7 +167,7 @@ main_test["Total PA"] = total_PA
 # train and test excluded data -> cross reference ids
 # train and test data that i want to use for later analysis -> + all brain variables -> testing different segmentations in the 3 Brain Age script
 
-main_test.to_pickle("2_main_test.pkl")
+main_test_crop.to_pickle("2_main_test.pkl")
 main_train.to_pickle("2_main_train.pkl")
 brain_test.to_pickle("2_brain_test.pkl")
 brain_train.to_pickle("2_brain_train.pkl")
