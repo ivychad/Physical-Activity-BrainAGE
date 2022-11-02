@@ -143,9 +143,10 @@ main_train = pd.DataFrame(main_train)
 
 # %%
 del main_test["Total PA"]
+del main_test["BrainAge Delta Corr"]
 corr = main_test.corr()
 corr = round(corr,2)
 fig, ax = plt.subplots(figsize=(15,10)) 
 sns.heatmap(corr, annot=True, cmap = "coolwarm", vmin=-1, vmax=1)
-print(main_test["BrainAge Delta Corr"])
+
 # %%
