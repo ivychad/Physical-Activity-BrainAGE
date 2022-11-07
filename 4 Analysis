@@ -50,6 +50,18 @@ main_train = pd.DataFrame(main_train)
 # compare train and test sets
 # compare included and excluded data (on available domains)
 
+plt.figure()
+plt.hist(main_test["Light PA"])
+plt.show()
+
+plt.figure()
+plt.hist(main_test["Moderate PA"])
+plt.show()
+
+plt.figure()
+plt.hist(main_test["Vigorous PA"])
+plt.show()
+
 
 # # plot self-reported moderate intensity physical activity
 # plt.figure()
@@ -143,7 +155,7 @@ main_train = pd.DataFrame(main_train)
 
 # %%
 del main_test["Total PA"]
-del main_test["BrainAge Delta Corr"]
+#del main_test["BrainAge Delta Corr"]
 corr = main_test.corr()
 corr = round(corr,2)
 fig, ax = plt.subplots(figsize=(15,10)) 

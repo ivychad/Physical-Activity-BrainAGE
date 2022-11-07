@@ -94,15 +94,18 @@ y_pred_cv = model.predict(X_test_cv)
 delta_cv = y_pred_cv - Y_test_cv
 print("The MAE for cross-validation:", mean_absolute_error(Y_test_cv,y_pred_cv))
 
-delta_cv = np.asarray(delta_cv)
-delta_cv = np.reshape(delta_cv, (-1,1))
+y_pred_cv = np.asarray(y_pred_cv)
+y_pred_cv = np.reshape(y_pred_cv, (-1,1))
 Y_test_cv = np.asarray(Y_test_cv)
 Y_test_cv = np.reshape(Y_test_cv, (-1,1))
 
 # brain age correction
-reg = LinearRegression().fit(delta_cv, Y_test_cv)
-coef = reg.coef_
-intercept = reg.intercept_
+# correction proposed in other paper used delta and age for linear model
+# now using correction from the R code that's online from Cole
+reg = LinearRegression().fit(Y_test_cv, y_pred_cv)
+coef = float(reg.coef_)
+intercept = float(reg.intercept_)
+print(coef, intercept)
 
 
 
@@ -118,11 +121,11 @@ model.fit(X_train_std,Y_train)
 
 # get predicted values for test set
 y_pred = model.predict(X_test_std)
-main_test["BrainAge"] = y_pred
+main_test["BA ASEG"] = y_pred
 
 # calculate brain age gap
 brain_age_delta = y_pred-Y_test
-main_test["BrainAge Delta"] = brain_age_delta
+main_test["BA ASEG Delta"] = brain_age_delta
 
 # check whether brain age gap and age are correlated
 correlation = stats.pearsonr(brain_age_delta, Y_test)
@@ -130,27 +133,37 @@ correlation = stats.pearsonr(brain_age_delta, Y_test)
 
 
 # corrected brain age
-function = lambda t: coef * t + intercept
+# correction by other article
+#function = lambda t: coef * t + intercept
+#vfunc = np.vectorize(function)
+#offset = vfunc(Y_test)
+#corr_brainage = y_pred-offset
+
+# correction by cole
+function = lambda t: (t-intercept)/coef
 vfunc = np.vectorize(function)
-offset = vfunc(Y_test)
-corr_brainage = y_pred-offset
+corr_brainage = vfunc(y_pred)
+corr_brainage = np.asarray(corr_brainage)
 corr_brainage_delta = corr_brainage-Y_test
 
-main_test["BrainAge Corr"] = corr_brainage
-main_test["BrainAge Delta Corr"] = corr_brainage_delta
+main_test["BA ASEG Corr"] = corr_brainage
+main_test["BA ASEG Delta Corr"] = corr_brainage_delta
 
 # get mean absolute error (MAE)
 print("The MAE for testing set:", mean_absolute_error(Y_test,y_pred))
 
-# #plot figure with x: actual age Y: predicted age, and a line with slope 1 for reference
-# plt.figure()
-# plt.scatter(Y_test, y_pred, alpha=0.5)
-# plt.axline((60,60), slope=1, color='r')
-# plt.xticks(range(40,90,5))
-# plt.yticks(range(40,90,5))
-# plt.ylabel('Predicted Age', fontsize = 15)
-# plt.xlabel('Age', fontsize = 15)
-# plt.show()
+print("The corrected MAE is:", mean_absolute_error(Y_test, corr_brainage))
+
+#plot figure with x: actual age Y: predicted age, and a line with slope 1 for reference
+plt.figure()
+plt.scatter(Y_test, y_pred, alpha=0.5)
+plt.axline((60,60), slope=1, color='r')
+plt.axline((60,60),slope=coef, color="black")
+plt.xticks(range(40,90,5))
+plt.yticks(range(40,90,5))
+plt.ylabel('Predicted Age', fontsize = 15)
+plt.xlabel('Age', fontsize = 15)
+plt.show()
 
 # plt.figure()
 # plt.scatter(Y_test,brain_age_delta, alpha=0.5)
@@ -160,7 +173,19 @@ print("The MAE for testing set:", mean_absolute_error(Y_test,y_pred))
 # plt.xlabel("Age", fontsize = 15)
 # plt.show()
 
+plt.figure()
+plt.scatter(Y_test, corr_brainage, alpha=0.5)
+#plt.axline((60,5), slope=-0.69, color="r")
+#plt.axline((60,0),slope=1, color = "g")
+plt.ylabel("Brain Age", fontsize = 15)
+plt.axline((60,60), slope=1, color='r')
+plt.xlabel("Age", fontsize = 15)
+plt.xticks(range(30,100,5))
+plt.yticks(range(30,100,5))
+plt.show()
 
+correlation = stats.pearsonr(y_pred, Y_test)
+print(correlation)
 # add to pickle brain age based on different segmentations :)
 
 
