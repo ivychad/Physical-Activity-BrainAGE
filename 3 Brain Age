@@ -38,15 +38,19 @@ brain_train = pd.DataFrame(brain_train)
 main_test = pd.DataFrame(main_test)
 main_train = pd.DataFrame(main_train)
 
+# other segmentation
+
 
 
 # Freesurfer ASEG
+# select Freesurfer ASEG for training data
 whole_brain = brain_train.iloc[:,27:70:2]
 left_hemi = brain_train.iloc[:,103:134:2]
 right_hemi = brain_train.iloc[:,165:196:2]
 age = brain_train["Age"]
 brain_train_s = pd.concat([whole_brain,left_hemi, right_hemi,age],axis = 1)
 
+# select Freesurfer ASEG for testing data
 whole_brain = brain_test.iloc[:,27:70:2]
 left_hemi = brain_test.iloc[:,103:134:2]
 right_hemi = brain_test.iloc[:,165:196:2]
@@ -55,7 +59,7 @@ brain_test_s = pd.concat([whole_brain,left_hemi, right_hemi,age],axis = 1)
 brain_train_s = pd.DataFrame(brain_train_s)
 brain_test_s = pd.DataFrame(brain_test_s)
 
-# delete rows with nan values
+# delete rows with nan values (it's not a lot here, so no imputing needed)
 nan_test = brain_test_s[brain_test_s.isnull().any(axis=1)].index
 nan_train = brain_train_s[brain_train_s.isnull().any(axis=1)].index
 brain_testing = brain_test_s.dropna(axis=0)
@@ -63,30 +67,31 @@ brain_training = brain_train_s.dropna(axis=0)
 main_test = main_test.drop(nan_test)
 main_train = main_train.drop(nan_train)
 
-
-# # impute nan values in mri data
+# impute nan values in mri data
 # # imp_mean = IterativeImputer(random_state=0)
 # # imp_mean.fit_transform(df[:,:-1])
 
+
+# BrainAge prediction
 # declare training and testing data - X: brain variables, Y: actual age
 X_train = brain_training.iloc[:,:-1]
 Y_train = brain_training.iloc[:,-1]
 X_test = brain_testing.iloc[:,:-1]
 Y_test = brain_testing.iloc[:,-1]
 
-# set of alphas to try
+# set of alphas to try (=penalization)
 alpha_parameters = np.power(10,np.linspace(start=-3, stop=5, num=100))
 
-# standardize x data
+# standardize x-data
 scaler = StandardScaler()
-
 X_train_std = scaler.fit_transform(X_train)
 X_test_std = scaler.fit_transform(X_test)
 
-# cross validation on training set only
+# Cross validation
+# cross validation on training set only -> select training set
 X_CV = X_train_std
 Y_CV = Y_train
-# randomly split data into training and testing set
+# randomly split data (only training no PA) into training and testing set
 X_train_cv, X_test_cv, Y_train_cv, Y_test_cv = train_test_split(X_CV,Y_CV, random_state=8)
 model = RidgeCV(alphas = alpha_parameters)
 model.fit(X_train_cv,Y_train_cv)
@@ -94,29 +99,15 @@ y_pred_cv = model.predict(X_test_cv)
 delta_cv = y_pred_cv - Y_test_cv
 print("The MAE for cross-validation:", mean_absolute_error(Y_test_cv,y_pred_cv))
 
-y_pred_cv = np.asarray(y_pred_cv)
-y_pred_cv = np.reshape(y_pred_cv, (-1,1))
-Y_test_cv = np.asarray(Y_test_cv)
-Y_test_cv = np.reshape(Y_test_cv, (-1,1))
-
-# brain age correction
-# correction proposed in other paper used delta and age for linear model
-# now using correction from the R code that's online from Cole
-reg = LinearRegression().fit(Y_test_cv, y_pred_cv)
-coef = float(reg.coef_)
-intercept = float(reg.intercept_)
-print(coef, intercept)
-
-
-
-
-# model on trained on training tested on test
+# BrainAge model for testing data
+# model trained on training tested on test
 # model initialization - options to use Lasso, Ridge or SVM
+
 #model = LassoCV(alphas = alpha_parameters, max_iter=100000)
 #model = RidgeCV(alphas = alpha_parameters)
 model = SVR(kernel = 'rbf')
 
-# train model
+# train model on training data
 model.fit(X_train_std,Y_train)
 
 # get predicted values for test set
@@ -128,8 +119,11 @@ brain_age_delta = y_pred-Y_test
 main_test["BA ASEG Delta"] = brain_age_delta
 
 # check whether brain age gap and age are correlated
-correlation = stats.pearsonr(brain_age_delta, Y_test)
-#print(correlation)
+# correlation = stats.pearsonr(brain_age_delta, Y_test)
+# print(correlation)
+
+# get mean absolute error (MAE)
+print("The MAE for testing set:", mean_absolute_error(Y_test,y_pred))
 
 
 # corrected brain age
@@ -139,20 +133,31 @@ correlation = stats.pearsonr(brain_age_delta, Y_test)
 #offset = vfunc(Y_test)
 #corr_brainage = y_pred-offset
 
+# reformat cross validation data for regression model
+y_pred_cv = np.asarray(y_pred_cv)
+y_pred_cv = np.reshape(y_pred_cv, (-1,1))
+Y_test_cv = np.asarray(Y_test_cv)
+Y_test_cv = np.reshape(Y_test_cv, (-1,1))
+
+# now using correction from the R code that's online from Cole
+reg = LinearRegression().fit(Y_test_cv, y_pred_cv)
+coef = float(reg.coef_)
+intercept = float(reg.intercept_)
+print("Coefficient and Intercept:", coef, intercept)
+
 # correction by cole
 function = lambda t: (t-intercept)/coef
 vfunc = np.vectorize(function)
 corr_brainage = vfunc(y_pred)
-corr_brainage = np.asarray(corr_brainage)
 corr_brainage_delta = corr_brainage-Y_test
 
+# add to dataframe
 main_test["BA ASEG Corr"] = corr_brainage
 main_test["BA ASEG Delta Corr"] = corr_brainage_delta
 
-# get mean absolute error (MAE)
-print("The MAE for testing set:", mean_absolute_error(Y_test,y_pred))
-
+# corrected MAE
 print("The corrected MAE is:", mean_absolute_error(Y_test, corr_brainage))
+
 
 #plot figure with x: actual age Y: predicted age, and a line with slope 1 for reference
 plt.figure()
@@ -184,13 +189,8 @@ plt.xticks(range(30,100,5))
 plt.yticks(range(30,100,5))
 plt.show()
 
-correlation = stats.pearsonr(y_pred, Y_test)
-print(correlation)
-# add to pickle brain age based on different segmentations :)
 
-
-
-
+# pickle results
 main_test.to_pickle("3_main_test.pkl")
 main_train.to_pickle("3_main_train.pkl")
 brain_test.to_pickle("3_brain_test.pkl")
