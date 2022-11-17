@@ -31,6 +31,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from random import seed
+import random
 
 
 seed(888)
@@ -53,54 +54,71 @@ brain_test = brain_test.drop(index_age_test)
 main_test = main_test.drop(index_age_test)
 main_train = main_train.drop(index_age_train)
 
+print(main_test.shape)
+
+length = int(int(main_test.shape[0])-1)
+half = int(int(main_test.shape[0])/2)
+random_indices = random.sample(range(0, length), half)
+main_test_validate = main_test.iloc[random_indices,:]
+main_test = main_test.drop(main_test.iloc[random_indices].index)
+brain_test_validate = brain_test.iloc[random_indices,:]
+brain_test = brain_test.drop(brain_test.iloc[random_indices].index)
+
+print(main_test.shape)
+
+main_test_validate.to_pickle("main_test_validate.pkl")
+brain_test_validate.to_pickle("brain_test_validate.pkl")
+
 # for later comparison: all data -> compute things for excluded people
 all_main_test = main_test
 all_main_train = main_train
 all_brain_test = brain_test
 all_brain_train = brain_train
 
-# exclude people with long standing illness diability or infirmity
-index_illness_train = main_train[main_train["longstanding_illness_disability_or_infirmity_f2188_0_0"]!= "No"].index
-index_illness_test = main_test[main_test["longstanding_illness_disability_or_infirmity_f2188_0_0"]!= "No"].index
-brain_train = brain_train.drop(index_illness_train)
-brain_test = brain_test.drop(index_illness_test)
-main_test = main_test.drop(index_illness_test)
-main_train = main_train.drop(index_illness_train)
+# # exclude people with long standing illness diability or infirmity
+# index_illness_train = main_train[main_train["longstanding_illness_disability_or_infirmity_f2188_0_0"]!= "No"].index
+# index_illness_test = main_test[main_test["longstanding_illness_disability_or_infirmity_f2188_0_0"]!= "No"].index
+# brain_train = brain_train.drop(index_illness_train)
+# brain_test = brain_test.drop(index_illness_test)
+# main_test = main_test.drop(index_illness_test)
+# main_train = main_train.drop(index_illness_train)
 
-# exclude people with disorders of the nervous system
-nervous_train = main_train[main_train["diagnoses_icd10_f41270_0_0"].str.contains("G")==True].index
-nervous_test = main_test[main_test["diagnoses_icd10_f41270_0_0"].str.contains("G")==True].index
-brain_train = brain_train.drop(nervous_train)
-brain_test = brain_test.drop(nervous_test)
-main_test = main_test.drop(nervous_test)
-main_train = main_train.drop(nervous_train)
+# # exclude people with disorders of the nervous system
+# nervous_train = main_train[main_train["diagnoses_icd10_f41270_0_0"].str.contains("G")==True].index
+# nervous_test = main_test[main_test["diagnoses_icd10_f41270_0_0"].str.contains("G")==True].index
+# brain_train = brain_train.drop(nervous_train)
+# brain_test = brain_test.drop(nervous_test)
+# main_test = main_test.drop(nervous_test)
+# main_train = main_train.drop(nervous_train)
 
-# exclude people with malicious neoplasm in the brain
-neoplasm_train = main_train[main_train["diagnoses_icd10_f41270_0_0"].str.contains("C71")==True].index
-neoplasm_test = main_test[main_test["diagnoses_icd10_f41270_0_0"].str.contains("C71")==True].index
-brain_train = brain_train.drop(neoplasm_train)
-brain_test = brain_test.drop(neoplasm_test)
-main_test = main_test.drop(neoplasm_test)
-main_train = main_train.drop(neoplasm_train)
+# # exclude people with malicious neoplasm in the brain
+# neoplasm_train = main_train[main_train["diagnoses_icd10_f41270_0_0"].str.contains("C71")==True].index
+# neoplasm_test = main_test[main_test["diagnoses_icd10_f41270_0_0"].str.contains("C71")==True].index
+# brain_train = brain_train.drop(neoplasm_train)
+# brain_test = brain_test.drop(neoplasm_test)
+# main_test = main_test.drop(neoplasm_test)
+# main_train = main_train.drop(neoplasm_train)
 
-# exclude people with circulatory disease 
-circulatory_train = main_train[main_train["diagnoses_icd10_f41270_0_0"].str.contains("I")==True].index
-circulatory_test = main_test[main_test["diagnoses_icd10_f41270_0_0"].str.contains("I")==True].index
-brain_train = brain_train.drop(circulatory_train)
-brain_test = brain_test.drop(circulatory_test)
-main_test = main_test.drop(circulatory_test)
-main_train = main_train.drop(circulatory_train)
+# # exclude people with circulatory disease 
+# circulatory_train = main_train[main_train["diagnoses_icd10_f41270_0_0"].str.contains("I")==True].index
+# circulatory_test = main_test[main_test["diagnoses_icd10_f41270_0_0"].str.contains("I")==True].index
+# brain_train = brain_train.drop(circulatory_train)
+# brain_test = brain_test.drop(circulatory_test)
+# main_test = main_test.drop(circulatory_test)
+# main_train = main_train.drop(circulatory_train)
 
-# exclude people who don't have good or excellent self-rated health
-health_train = main_train[(main_train["overall_health_rating_f2178_0_0"]!= "Good") & (main_train["overall_health_rating_f2178_0_0"]!= "Excellent")].index
-health_test = main_test[(main_test["overall_health_rating_f2178_0_0"]!= "Good") & (main_test["overall_health_rating_f2178_0_0"]!= "Excellent")].index
-brain_train = brain_train.drop(health_train)
-brain_test = brain_test.drop(health_test)
-main_test = main_test.drop(health_test)
-main_train = main_train.drop(health_train)
+# # exclude people who don't have good or excellent self-rated health
+# health_train = main_train[(main_train["overall_health_rating_f2178_0_0"]!= "Good") & (main_train["overall_health_rating_f2178_0_0"]!= "Excellent")].index
+# health_test = main_test[(main_test["overall_health_rating_f2178_0_0"]!= "Good") & (main_test["overall_health_rating_f2178_0_0"]!= "Excellent")].index
+# brain_train = brain_train.drop(health_train)
+# brain_test = brain_test.drop(health_test)
+# main_test = main_test.drop(health_test)
+# main_train = main_train.drop(health_train)
 
 
 # physical activity accelerometer processing
+
+# data quality parameter check - look for overlap with weartime
 
 # get weartime duration in minutes (it's in days at default)
 main_test["Wear time in minutes"] = main_test.iloc[:,16686]*1440
@@ -113,6 +131,8 @@ plt.show()
 wear_time_test = main_test[main_test["Wear time in minutes"]<8000].index
 brain_test = brain_test.drop(wear_time_test)
 main_test = main_test.drop(wear_time_test)
+
+# use continuous scale for milligravites
 
 # distributions are cumulative -> substract ditributions from each other
 # determine fraction of weartime spent doing light PA (between 30 and 125 milligravites)
