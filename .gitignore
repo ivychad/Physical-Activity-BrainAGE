@@ -17,3 +17,7 @@
 /brain_test_validate.pkl
 /main_test_validate.pkl
 /young_male.csv
+/v_main_train.pkl
+/v_main_test.pkl
+/v_brain_train.pkl
+/v_brain_test.pkl
