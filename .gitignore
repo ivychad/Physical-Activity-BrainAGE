@@ -1,4 +1,5 @@
 /1_main_train.pkl
+/3_validate.pkl
 /1_main_test.pkl
 /1_brain_train.pkl
 /1_brain_test.pkl
@@ -22,4 +23,4 @@
 /v_brain_train.pkl
 /v_brain_test.pkl
 /6_main_test.pkl
-/3_validate.pkl
+
