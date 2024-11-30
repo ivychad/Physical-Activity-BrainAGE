@@ -5,9 +5,18 @@
 
 /2_main_train.pkl
 /2_main_test.pkl
+/2_val_test.pkl
 
 /brain_test_validate.pkl
 /main_test_validate.pkl
+
+/eduheatmap.png
+/edulasso.png
+/edulassosr.png
+/eduvalheatmap.png
+/eduvallasso.png
+/eduvallassosr.png
+
 
 /mainbrainage.png
 /mainbrainagecorr.png
