@@ -9,4 +9,24 @@
 /brain_test_validate.pkl
 /main_test_validate.pkl
 
+/mainbrainage.png
+/mainbrainagecorr.png
+/mainbrainpad.png
+/mainheatmap.png
+/mainpa.png
+/mainpascat.png
+/mainsrpa.png
+/mainlasso.png
+/mainlassosr.png
+
+/valbrainage.png
+/valbrainagecorr.png
+/valbrainpad.png
+/valheatmap.png
+/valpa.png
+/valpascat.png
+/valsrpa.png
+/vallasso.png
+/vallassosr.png
+
 
